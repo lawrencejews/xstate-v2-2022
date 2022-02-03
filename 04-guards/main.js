@@ -38,6 +38,10 @@ const playerMachine = createMachine({
       },
       // Add an eventless transition here that always goes to 'paused'
       // when `elapsed` value is >= the `duration` value
+      always: {
+        cond: (context) => context.elapsed >= context.duration,
+        target: 'paused',
+      }
     },
   },
   on: {
@@ -62,6 +66,9 @@ const playerMachine = createMachine({
     VOLUME: {
       // Make sure the volume can only be assigned if the level is
       // within range (between 0 and 10)
+      cond: (context, event) => {
+        return event.level >= 0 && event.level <= 10;
+      },
       actions: 'assignVolume',
     },
     'AUDIO.TIME': {
