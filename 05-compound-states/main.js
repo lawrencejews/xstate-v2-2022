@@ -24,13 +24,37 @@ const playerMachine = createMachine({
         LOADED: {
           actions: 'assignSongData',
           // Make this go to a 'ready' state instead
-          target: 'paused',
+          target: 'ready',
         },
       },
     },
     // Refactor the 'paused' and 'playing' states so that
     // they are children of the 'ready' state.
     // Don't forget to add an initial state!
+    ready: {
+      initial: 'playing',
+      states: {
+        paused: {
+      on: {
+        PLAY: { target: 'playing' },
+      },
+    },
+        playing: {
+      tags: ['playing'],
+      entry: 'playAudio',
+      exit: 'pauseAudio',
+      on: {
+        PAUSE: { target: 'paused' },
+      },
+      always: {
+        cond: (ctx) => ctx.elapsed >= ctx.duration,
+        // We changed this to an ID so that it can target
+        // the loading state at any position
+        target: '#loading',
+      },
+    },
+      }
+    },
     paused: {
       on: {
         PLAY: { target: 'playing' },
@@ -109,6 +133,7 @@ const playerMachine = createMachine({
   },
 });
 
+
 const service = interpret(playerMachine).start();
 window.service = service;
 
@@ -131,6 +156,8 @@ elements.elDislikeButton.addEventListener('click', () => {
 service.subscribe((state) => {
   console.log(state.value, state.context);
   const { context } = state;
+  
+  const isPlaying = state.hasTag('playing');
 
   elements.elLoadingButton.hidden = !state.hasTag('loading');
   elements.elPlayButton.hidden = !state.can({ type: 'PLAY' });
