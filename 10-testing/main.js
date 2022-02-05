@@ -6,10 +6,10 @@ import { inspect } from '@xstate/inspect';
 import { formatTime } from '../utils/formatTime';
 import elements from '../utils/elements';
 
-// inspect({
-//   iframe: false,
-//   url: 'https://stately.ai/viz?inspect',
-// });
+inspect({
+  iframe: false,
+  url: 'https://stately.ai/viz?inspect',
+});
 
 function createFakeAudio(duration) {
   let currentTime = 0;
